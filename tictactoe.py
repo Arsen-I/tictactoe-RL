@@ -22,9 +22,9 @@ class TicTacToe:
             elif np.all(self.board != 0):
                 self.done = True
                 self.winner = 0
-                reward = 0
+                reward = 0.05
             else:
-                reward = 0
+                reward = 0.5
             return self.board.copy(), reward, self.done
         else:
             return self.board.copy(), -1, self.done

@@ -129,11 +129,11 @@ def play_against_agent_first_move(agent):
         print("Ничья!")
 
 # Обучение агента
-agent_human_first = train_agent_first_move(5000)
+agent_human_first = train_agent_first_move(10000)
 agent_human_first.save("agent_human_first.pkl")
 
 
-agent_human_second = train_agent_second_move(5000)
+agent_human_second = train_agent_second_move(10000)
 agent_human_second.save("agent_human_second.pkl")
 
 # Игра против случайного противника
