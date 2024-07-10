@@ -15,8 +15,10 @@ def play_against_agent_second_move(agent):
         # Ход агента
         state_tuple = board_to_tuple(state)
         action = agent.choose_action(state_tuple)
-        state, _, done = env.step(action, 1)
-        state_tuple = board_to_tuple(state)
+        next_state, reward, done = env.step(action, 1)
+        next_state_tuple = board_to_tuple(next_state)
+        agent.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
+        state = next_state
 
         if done:
             break
@@ -36,8 +38,11 @@ def play_against_agent_second_move(agent):
             if human_action not in env.available_actions():
                 print("Это место уже занято или ход неверный. Попробуйте снова.")
 
-        state, _, done = env.step(human_action, -1)
-        state_tuple = board_to_tuple(state)
+        next_state, _, done = env.step(human_action, -1)
+        next_state_tuple = board_to_tuple(next_state)
+        reward = -1 if done else 0
+        agent.update_q_value(state_tuple, human_action, reward, next_state_tuple)  # Обновление Q-таблицы
+        state = next_state
 
     env.render()
 
@@ -60,7 +65,7 @@ def play_against_agent(agent):
         env.render()
         print()
 
-        # Ход
+        # Ход человека
         human_action = None
         while human_action not in env.available_actions():
             try:
@@ -72,16 +77,22 @@ def play_against_agent(agent):
             if human_action not in env.available_actions():
                 print("Это место уже занято или ход неверный. Попробуйте снова.")
 
-        state, _, done = env.step(human_action, 1)
-        state_tuple = board_to_tuple(state)
+        next_state, _, done = env.step(human_action, 1)
+        next_state_tuple = board_to_tuple(next_state)
+        reward = 1 if done else 0
+        agent.update_q_value(state_tuple, human_action, reward, next_state_tuple)  # Обновление Q-таблицы
+        state = next_state
 
         if done:
             break
 
         # Ход агента
-        action = agent.choose_action(state_tuple)
-        state, _, done = env.step(action, -1)
         state_tuple = board_to_tuple(state)
+        action = agent.choose_action(state_tuple)
+        next_state, reward, done = env.step(action, -1)
+        next_state_tuple = board_to_tuple(next_state)
+        agent.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
+        state = next_state
 
     env.render()
 
@@ -92,14 +103,14 @@ def play_against_agent(agent):
     else:
         print("Ничья!")
 
-
-# Загрузка обученного агента и игра против него
 if __name__ == "__main__":
     number = int(input("Введите 0 если хотите ходить КРЕСТИКОМ, либо 1 если хотите ходить НОЛИКОМ: "))
 
     if number == 0:
         trained_agent = QLearningAgent.load("agent_human_first.pkl")
         play_against_agent(trained_agent)
+        trained_agent.save("agent_human_first_updated.pkl")  # Сохранение обновленного агента
     else:
         trained_agent = QLearningAgent.load("agent_human_second.pkl")
         play_against_agent_second_move(trained_agent)
+        trained_agent.save("agent_human_second_updated.pkl")  # Сохранение обновленного агента

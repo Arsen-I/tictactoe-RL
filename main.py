@@ -39,11 +39,11 @@ def play_against_agent_second_move(agent):
     state_tuple = board_to_tuple(state)
     done = False
 
-    print("Агент играет крестиками (-1), вы играете ноликами (1).")
+    print("Агент играет крестиками (1), вы играете ноликами (-1).")
 
     # Первый ход агента
     action = agent.choose_action(state_tuple)
-    state, _, done = env.step(action, -1)
+    state, _, done = env.step(action, 1)
     state_tuple = board_to_tuple(state)
 
     while not done:
@@ -62,7 +62,7 @@ def play_against_agent_second_move(agent):
             if human_action not in env.available_actions():
                 print("Это место уже занято или ход неверный. Попробуйте снова.")
 
-        state, _, done = env.step(human_action, 1)
+        state, _, done = env.step(human_action, -1)
         state_tuple = board_to_tuple(state)
 
         if done:
@@ -70,17 +70,19 @@ def play_against_agent_second_move(agent):
 
         # Ход агента
         action = agent.choose_action(state_tuple)
-        state, _, done = env.step(action, -1)
+        state, _, done = env.step(action, 1)
         state_tuple = board_to_tuple(state)
 
     env.render()
 
-    if env.winner == 1:
+    if env.winner == -1:
         print("Вы выиграли!")
-    elif env.winner == -1:
+    elif env.winner == 1:
         print("Агент выиграл!")
     else:
         print("Ничья!")
+
+
 
 
 def play_against_agent_first_move(agent):
@@ -128,12 +130,15 @@ def play_against_agent_first_move(agent):
     else:
         print("Ничья!")
 
+
+
+
 # Обучение агента
-agent_human_first = train_agent_first_move(10000)
+agent_human_first = train_agent_first_move(100000)
 agent_human_first.save("agent_human_first.pkl")
 
 
-agent_human_second = train_agent_second_move(10000)
+agent_human_second = train_agent_second_move(100000)
 agent_human_second.save("agent_human_second.pkl")
 
 # Игра против случайного противника
