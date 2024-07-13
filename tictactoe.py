@@ -21,14 +21,14 @@ class TicTacToe:
                 self.winner = player
                 # print(f"player = {player}")
                 self.win_count[player] += 1
-                reward = +2
+                reward = +3
             elif np.all(self.board != 0):
                 self.done = True
                 self.winner = 0
                 self.win_count[0] += 1
-                reward = +1.5
+                reward = +1.7
             else:
-                reward = +0.01
+                reward = +0.001
             return self.board.copy(), reward, self.done
         else:
             return self.board.copy(), -2, self.done

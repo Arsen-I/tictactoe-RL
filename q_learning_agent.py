@@ -4,7 +4,7 @@ import pickle
 
 class QLearningAgent:
 
-    def __init__(self, alpha=0.2, gamma=0.9, epsilon=0.5, epsilon_decay=0.999999):
+    def __init__(self, alpha=0.05, gamma=1, epsilon=0.01, epsilon_decay=0.8):
         self.q_table = {}
         self.alpha = alpha
         self.gamma = gamma
@@ -14,7 +14,7 @@ class QLearningAgent:
 
     def get_q_value(self, state, action):
         state_tuple = tuple(tuple(row) for row in state)
-        return self.q_table.get((state_tuple, action), -0.0001)
+        return self.q_table.get((state_tuple, action), 0.0)
 
     def update_q_value(self, state, action, reward, next_state):
         state_tuple = tuple(tuple(row) for row in state)
@@ -128,9 +128,8 @@ def train_agent_first_move(episodes):
             if done:
                 break
 
-        agent.epsilon *= agent.epsilon_decay
 
-        if (episode + 1) % 10000 == 0:
+        if (episode + 1) % 100000 == 0:
             print(f"Episode {episode + 1}/{episodes} completed")
             print(f"Q-table size: {len(agent.q_table)}")
 
@@ -139,6 +138,11 @@ def train_agent_first_move(episodes):
             for action in agent.available_actions(test_state):
                 print(f"Q-values for state {test_state}:")
                 agent.show_q_table(test_state, action)
+
+
+            print(f"agent.epsilon = {agent.epsilon}")
+            agent.epsilon *= agent.epsilon_decay
+
 
     print("Выигрыши и ничьи, агент -1:", env.get_win_counts())
 
@@ -198,9 +202,8 @@ def train_agent_second_move(episodes):
             previous_state = state
             state = next_state
 
-        agent.epsilon *= agent.epsilon_decay
 
-        if (episode + 1) % 10000 == 0:
+        if (episode + 1) % 100000 == 0:
             print(f"Episode {episode + 1}/{episodes} completed")
             print(f"Q-table size: {len(agent.q_table)}")
 
@@ -209,6 +212,11 @@ def train_agent_second_move(episodes):
             for action in agent.available_actions(test_state):
                 print(f"Q-values for state {test_state}:")
                 agent.show_q_table(test_state, action)
+
+            print(f"agent.epsilon = {agent.epsilon}")
+
+            agent.epsilon *= agent.epsilon_decay
+
 
     print("Выигрыши и ничьи, агент +1:", env.get_win_counts())
 
