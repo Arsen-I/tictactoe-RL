@@ -4,7 +4,7 @@ import pickle
 
 class QLearningAgent:
 
-    def __init__(self, alpha=0.2, gamma=0.9, epsilon=0.5, epsilon_decay=1):
+    def __init__(self, alpha=0.99, gamma=0.99, epsilon=0.5, epsilon_decay=0.9):
         self.q_table = {}
         self.alpha = alpha
         self.gamma = gamma
@@ -23,7 +23,7 @@ class QLearningAgent:
         td_target = reward + self.gamma * self.get_q_value(next_state_tuple, best_next_action)
         td_error = td_target - self.get_q_value(state_tuple, action)
         new_q_value = self.get_q_value(state_tuple, action) + self.alpha * td_error
-        self.q_table[(state_tuple, action)] = new_q_value
+        self.q_table[(state_tuple, action)] = float(new_q_value)
 
     def available_actions(self, state):
         return [(i, j) for i in range(3) for j in range(3) if state[i][j] == 0]
@@ -41,7 +41,6 @@ class QLearningAgent:
     def choose_action(self, state):
         state_tuple = tuple(tuple(row) for row in state)
         if random.uniform(0, 1) < self.epsilon:
-            print("Random!")
             return random.choice(self.available_actions(state_tuple))
         else:
             act = self.best_action(state_tuple)
@@ -95,7 +94,7 @@ def train_agent_first_move(episodes):
                 break
 
 
-        if (episode + 1) % 50000 == 0:
+        if (episode + 1) % 100000 == 0:
             print(f"Episode {episode + 1}/{episodes} completed")
             print(f"Q-table size: {len(agent.q_table)}")
 
@@ -159,7 +158,7 @@ def train_agent_second_move(episodes):
             state = next_state
 
 
-        if (episode + 1) % 50000 == 0:
+        if (episode + 1) % 100000 == 0:
             print(f"Episode {episode + 1}/{episodes} completed")
             print(f"Q-table size: {len(agent.q_table)}")
 

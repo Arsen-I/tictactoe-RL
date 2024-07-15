@@ -15,7 +15,7 @@ def play_against_agent_second_move(agent):
 
         # Ход агента
         state_tuple = board_to_tuple(state)
-        action = agent.choose_action(state_tuple)
+        action = agent.best_action(state_tuple)
         next_state, reward, done = env.step(action, 1)
         next_state_tuple = board_to_tuple(next_state)
         agent.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
@@ -59,6 +59,7 @@ def play_against_agent(agent):
     state = env.reset()
     state_tuple = board_to_tuple(state)
     done = False
+    action = agent.choose_action(state_tuple)
 
     print("Вы играете крестиками (1), агент играет ноликами (-1).")
 
@@ -89,7 +90,7 @@ def play_against_agent(agent):
 
         # Ход агента
         state_tuple = board_to_tuple(state)
-        action = agent.choose_action(state_tuple)
+        action = agent.best_action(state_tuple)
         next_state, reward, done = env.step(action, -1)
         next_state_tuple = board_to_tuple(next_state)
         agent.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
@@ -110,6 +111,7 @@ def agent_against_agent(agent_first_step, agent_second_step):
     state = env.reset()
     state_tuple = board_to_tuple(state)
     previous_state = state_tuple
+    previous_action = agent_first_step.best_action(state_tuple)
 
     done = False
 
@@ -121,7 +123,7 @@ def agent_against_agent(agent_first_step, agent_second_step):
 
         # Ход агента за крестики
         state_tuple = board_to_tuple(state)
-        action = agent_first_step.choose_action(state_tuple)
+        action = agent_first_step.best_action(state_tuple)
         next_state, reward, done = env.step(action, 1)
         next_state_tuple = board_to_tuple(next_state)
         agent_first_step.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
@@ -131,7 +133,10 @@ def agent_against_agent(agent_first_step, agent_second_step):
             if env.check_winner(1):
                 print("тут победил крестик")
                 reward = -1
+
                 agent_second_step.update_q_value(previous_state, previous_action, reward, state)
+                agent_second_step.save("agent_human_first_updated.pkl")
+
             break
 
         previous_action = action
@@ -140,7 +145,7 @@ def agent_against_agent(agent_first_step, agent_second_step):
 
         # Ход агента за нолики
         state_tuple = board_to_tuple(state)
-        action = agent_second_step.choose_action(state_tuple)
+        action = agent_second_step.best_action(state_tuple)
         next_state, reward, done = env.step(action, -1)
         next_state_tuple = board_to_tuple(next_state)
         agent_second_step.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
@@ -148,13 +153,14 @@ def agent_against_agent(agent_first_step, agent_second_step):
         if done:
             if env.check_winner(-1):
                 print("тут победил нолик")
-                reward = -1
-                agent_first_step.update_q_value(previous_state, previous_action, reward, state)
+
+                agent_first_step.update_q_value(previous_state, previous_action, -1, state)
+                agent_first_step.save("agent_human_second_updated.pkl")
 
             break
         previous_action = action
-        previous_state = state_tuple
-        state = next_state_tuple
+        previous_state = state
+        state = next_state
 
 
     env.render()
@@ -168,6 +174,8 @@ def agent_against_agent(agent_first_step, agent_second_step):
     else:
         print("Ничья!")
         sum['-'] += 1
+
+
 
 def agent_against_random(agent_first_step):
 
@@ -287,20 +295,20 @@ if __name__ == "__main__":
 
     elif number == 2:
 
-        trained_agent_first_step = QLearningAgent.load("agent_human_first_updated.pkl")
-        trained_agent_second_step = QLearningAgent.load("agent_human_first_updated.pkl")
+        trained_agent_second_step = QLearningAgent.load("agent_human_first.pkl")
+        trained_agent_first_step = QLearningAgent.load("agent_human_second.pkl")
+
         sum = {'X':0, 'O':0, '-':0 }
 
-        for i in range(1000):
+        for i in range(300):
 
             agent_against_agent(trained_agent_first_step,trained_agent_first_step)
 
-            trained_agent_first_step.save("agent_human_second_updated.pkl")
-            trained_agent_second_step.save("agent_human_first_updated.pkl")
             print(f"{i} раз!")
             print(sum)
 
         print(sum)
+
 
 
     elif number == 3:
@@ -322,7 +330,6 @@ if __name__ == "__main__":
 
     elif number == 4:
         trained_agent_second_step = QLearningAgent.load("agent_human_first.pkl")
-
 
         sum = {'X':0, 'O':0, '-':0 }
 

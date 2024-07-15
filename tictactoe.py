@@ -24,7 +24,7 @@ class TicTacToe:
                 self.winner = 0
                 reward = 0.5
             else:
-                reward = 0
+                reward = 0.0
             return self.board.copy(), reward, self.done
         else:
             return self.board.copy(), -1, self.done
