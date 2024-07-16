@@ -2,7 +2,7 @@ import pickle
 from q_learning_agent import QLearningAgent
 
 # Загрузка объекта из файла
-with open("agent_human_second.pkl", "rb") as f:
+with open("agent_first.pkl", "rb") as f:
     loaded_object = pickle.load(f)
 
 print(type(loaded_object))

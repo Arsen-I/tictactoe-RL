@@ -4,7 +4,7 @@ import pickle
 
 class QLearningAgent:
 
-    def __init__(self, alpha=0.99, gamma=0.99, epsilon=0.5, epsilon_decay=0.9):
+    def __init__(self, alpha=0.3, gamma=0.9, epsilon=0.9, epsilon_decay=0.99):
         self.q_table = {}
         self.alpha = alpha
         self.gamma = gamma
@@ -63,7 +63,7 @@ def board_to_tuple(board):
     return tuple(tuple(row) for row in board)
 
 
-def train_agent_first_move(episodes):
+def train_agent_second_move(episodes):
     env = TicTacToe()
     agent = QLearningAgent()
 
@@ -94,27 +94,27 @@ def train_agent_first_move(episodes):
                 break
 
 
-        if (episode + 1) % 100000 == 0:
+        if (episode + 1) % 10000 == 0:
             print(f"Episode {episode + 1}/{episodes} completed")
             print(f"Q-table size: {len(agent.q_table)}")
 
-            test_state = board_to_tuple([[1.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
-            # agent.save("trained_agent_second_move.pkl")
-            for action in agent.available_actions(test_state):
-                print(f"Q-values for state {test_state}:")
-                agent.show_q_table(test_state, action)
-
-            test_state = board_to_tuple([[1.0, 0.0, -1.0], [0.0, 0.0, 1.0], [0.0, 0.0, 0.0]])
-            # agent.save("trained_agent_second_move.pkl")
-            for action in agent.available_actions(test_state):
-                print(f"Q-values for state {test_state}:")
-                agent.show_q_table(test_state, action)
-
-            test_state = board_to_tuple([[1.0, 0.0, 1.0], [-1.0, 0.0, 1.0], [-1.0, 0.0, 0.0]])
-            # agent.save("trained_agent_second_move.pkl")
-            for action in agent.available_actions(test_state):
-                print(f"Q-values for state {test_state}:")
-                agent.show_q_table(test_state, action)
+            # test_state = board_to_tuple([[1.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+            # # agent.save("trained_agent_second_move.pkl")
+            # for action in agent.available_actions(test_state):
+            #     print(f"Q-values for state {test_state}:")
+            #     agent.show_q_table(test_state, action)
+            #
+            # test_state = board_to_tuple([[1.0, 0.0, -1.0], [0.0, 0.0, 1.0], [0.0, 0.0, 0.0]])
+            # # agent.save("trained_agent_second_move.pkl")
+            # for action in agent.available_actions(test_state):
+            #     print(f"Q-values for state {test_state}:")
+            #     agent.show_q_table(test_state, action)
+            #
+            # test_state = board_to_tuple([[1.0, 0.0, 1.0], [-1.0, 0.0, 1.0], [-1.0, 0.0, 0.0]])
+            # # agent.save("trained_agent_second_move.pkl")
+            # for action in agent.available_actions(test_state):
+            #     print(f"Q-values for state {test_state}:")
+            #     agent.show_q_table(test_state, action)
 
 
             print(f"agent.epsilon = {agent.epsilon}")
@@ -125,7 +125,7 @@ def train_agent_first_move(episodes):
     return agent
 
 
-def train_agent_second_move(episodes):
+def train_agent_first_move(episodes):
     env = TicTacToe()
     agent = QLearningAgent()
 
@@ -158,27 +158,27 @@ def train_agent_second_move(episodes):
             state = next_state
 
 
-        if (episode + 1) % 100000 == 0:
+        if (episode + 1) % 10000 == 0:
             print(f"Episode {episode + 1}/{episodes} completed")
             print(f"Q-table size: {len(agent.q_table)}")
 
-            test_state = board_to_tuple([[1.0, -1.0, 0.0], [1.0, -1.0, 0.0], [0.0, 0.0, 0.0]])
-            # agent.save("trained_agent.pkl")
-            for action in agent.available_actions(test_state):
-                print(f"Q-values for state {test_state}:")
-                agent.show_q_table(test_state, action)
-
-            test_state = board_to_tuple([[0.0, 0.0, 1.0], [0.0, -1.0, 0.0], [1.0, 0.0, -1.0]])
-            # agent.save("trained_agent.pkl")
-            for action in agent.available_actions(test_state):
-                print(f"Q-values for state {test_state}:")
-                agent.show_q_table(test_state, action)
-
-            test_state = board_to_tuple([[-1.0, 1.0, 1.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
-            # agent.save("trained_agent.pkl")
-            for action in agent.available_actions(test_state):
-                print(f"Q-values for state {test_state}:")
-                agent.show_q_table(test_state, action)
+            # test_state = board_to_tuple([[1.0, -1.0, 0.0], [1.0, -1.0, 0.0], [0.0, 0.0, 0.0]])
+            # # agent.save("trained_agent.pkl")
+            # for action in agent.available_actions(test_state):
+            #     print(f"Q-values for state {test_state}:")
+            #     agent.show_q_table(test_state, action)
+            #
+            # test_state = board_to_tuple([[0.0, 0.0, 1.0], [0.0, -1.0, 0.0], [1.0, 0.0, -1.0]])
+            # # agent.save("trained_agent.pkl")
+            # for action in agent.available_actions(test_state):
+            #     print(f"Q-values for state {test_state}:")
+            #     agent.show_q_table(test_state, action)
+            #
+            # test_state = board_to_tuple([[-1.0, 1.0, 1.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+            # # agent.save("trained_agent.pkl")
+            # for action in agent.available_actions(test_state):
+            #     print(f"Q-values for state {test_state}:")
+            #     agent.show_q_table(test_state, action)
 
             print(f"agent.epsilon = {agent.epsilon}")
 
@@ -189,8 +189,72 @@ def train_agent_second_move(episodes):
     return agent
 
 
-if __name__ == "__main__":
-    trained_agent_first_move = train_agent_first_move(episodes=4000)
+def train_agent_against_agent(episodes):
+    env = TicTacToe()
 
-    trained_agent_second_move = train_agent_second_move(episodes=4000)
+    agent = QLearningAgent()
+    agent1 = QLearningAgent()
+
+    for episode in range(episodes):
+        state = env.reset()
+        state = board_to_tuple(state)
+        previous_state = state
+        done = False
+
+        while not done:
+            action = agent.choose_action(state)
+            next_state, reward, done = env.step(action, 1)
+            next_state = board_to_tuple(next_state)
+            agent.update_q_value(state, action, reward, next_state)
+
+            if done:
+                reward = -1
+                agent1.update_q_value(previous_state, action, reward, state)
+                break
+
+            previous_state = state
+            state = board_to_tuple(next_state)
+
+
+            action = agent.choose_action(state)
+            next_state, reward, done = env.step(action, -1)
+            next_state = board_to_tuple(next_state)
+            agent1.update_q_value(state, action, reward, next_state)
+
+            if done:
+                reward = -1
+                agent.update_q_value(previous_state, action, reward, state)
+                break
+
+            previous_state = state
+            state = next_state
+
+
+        if (episode + 1) % 50000 == 0:
+            print(f"Episode {episode + 1}/{episodes} completed")
+            print(f"Q-table size: {len(agent.q_table)}")
+            print(f"Q-table size: {len(agent1.q_table)}")
+
+            print("Для крестика")
+            test_state = board_to_tuple([[1.0, -1.0, 0.0], [1.0, -1.0, 0.0], [0.0, 0.0, 0.0]])
+            for action in agent.available_actions(test_state):
+                print(f"Q-values for state {test_state}:")
+                agent.show_q_table(test_state, action)
+
+            print("Для нолика")
+            test_state = board_to_tuple([[1.0, 0.0, 1.0], [-1.0, 0.0, 1.0], [-1.0, 0.0, 0.0]])
+            for action in agent1.available_actions(test_state):
+                print(f"Q-values for state {test_state}:")
+                agent1.show_q_table(test_state, action)
+
+
+            print(f"agent.epsilon = {agent.epsilon}")
+
+            agent.epsilon *= agent.epsilon_decay
+            agent1.epsilon *= agent1.epsilon_decay
+
+
+
+    return agent,agent1
+
 

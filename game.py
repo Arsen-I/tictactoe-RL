@@ -126,16 +126,16 @@ def agent_against_agent(agent_first_step, agent_second_step):
         action = agent_first_step.best_action(state_tuple)
         next_state, reward, done = env.step(action, 1)
         next_state_tuple = board_to_tuple(next_state)
-        agent_first_step.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
+        # agent_first_step.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
 
 
         if done:
-            if env.check_winner(1):
-                print("тут победил крестик")
-                reward = -1
-
-                agent_second_step.update_q_value(previous_state, previous_action, reward, state)
-                agent_second_step.save("agent_human_first_updated.pkl")
+            # if env.check_winner(1):
+            #     print("тут победил крестик")
+            #     reward = -1
+            #
+            #     agent_second_step.update_q_value(previous_state, previous_action, reward, state)
+            #     agent_second_step.save("agent_human_first_updated.pkl")
 
             break
 
@@ -148,14 +148,14 @@ def agent_against_agent(agent_first_step, agent_second_step):
         action = agent_second_step.best_action(state_tuple)
         next_state, reward, done = env.step(action, -1)
         next_state_tuple = board_to_tuple(next_state)
-        agent_second_step.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
+        # agent_second_step.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
 
         if done:
-            if env.check_winner(-1):
-                print("тут победил нолик")
-
-                agent_first_step.update_q_value(previous_state, previous_action, -1, state)
-                agent_first_step.save("agent_human_second_updated.pkl")
+            # if env.check_winner(-1):
+            #     print("тут победил нолик")
+            #
+            #     agent_first_step.update_q_value(previous_state, previous_action, -1, state)
+            #     agent_first_step.save("agent_human_second_updated.pkl")
 
             break
         previous_action = action
@@ -167,13 +167,20 @@ def agent_against_agent(agent_first_step, agent_second_step):
 
     if env.winner == 1:
         print("Выиграл Х")
-        sum['X'] += 1
+        return 1
+
+        # sum['X'] += 1
     elif env.winner == -1:
         print("Выиграл 0")
-        sum['O'] += 1
+        return -1
+        # sum['O'] += 1
     else:
         print("Ничья!")
-        sum['-'] += 1
+        return  0
+        # sum['-'] += 1
+
+    agent_second_step.save("agent_second_updated.pkl")
+    agent_first_step.save("agent_first_updated.pkl")
 
 
 
@@ -221,13 +228,13 @@ def agent_against_random(agent_first_step):
 
     if env.winner == 1:
         print("Выиграл Х")
-        sum['X'] += 1
+        return 1
     elif env.winner == -1:
         print("Выиграл 0")
-        sum['O'] += 1
+        return 0
     else:
         print("Ничья!")
-        sum['-'] += 1
+        return 0
 
 
 def random_against_agent(agent_second_step):
@@ -267,78 +274,12 @@ def random_against_agent(agent_second_step):
 
     if env.winner == 1:
         print("Выиграл Х")
-        sum['X'] += 1
+        return 0
     elif env.winner == -1:
         print("Выиграл 0")
-        sum['O'] += 1
+        return 1
     else:
         print("Ничья!")
-        sum['-'] += 1
+        return 0
 
 
-
-if __name__ == "__main__":
-    number = int(input("Введите 0 если хотите ходить КРЕСТИКОМ, либо 1 если хотите ходить НОЛИКОМ, либо 2 - агент против агента для обучения. "
-                       "Ну а если хотите дообучить на с рандомом то 3 для агента с крестиком, 4 для агента с ноликом:  "))
-
-    if number == 0:
-        trained_agent = QLearningAgent.load("agent_human_first_updated.pkl")
-        play_against_agent(trained_agent)
-        trained_agent.save("agent_human_first_updated.pkl")  # Сохранение обновленного агента
-
-
-    elif number == 1:
-        trained_agent = QLearningAgent.load("agent_human_second_updated.pkl")
-        play_against_agent_second_move(trained_agent)
-        trained_agent.save("agent_human_second_updated.pkl")  # Сохранение обновленного агента
-
-
-    elif number == 2:
-
-        trained_agent_second_step = QLearningAgent.load("agent_human_first.pkl")
-        trained_agent_first_step = QLearningAgent.load("agent_human_second.pkl")
-
-        sum = {'X':0, 'O':0, '-':0 }
-
-        for i in range(300):
-
-            agent_against_agent(trained_agent_first_step,trained_agent_first_step)
-
-            print(f"{i} раз!")
-            print(sum)
-
-        print(sum)
-
-
-
-    elif number == 3:
-        trained_agent_first_step = QLearningAgent.load("agent_human_second.pkl")
-        sum = {'X':0, 'O':0, '-':0 }
-
-
-
-        for i in range(2000):
-
-            agent_against_random(trained_agent_first_step)
-
-            trained_agent_first_step.save("agent_human_second_updated.pkl")
-            print(f"{i} раз!")
-            print(sum)
-
-        print(sum)
-
-
-    elif number == 4:
-        trained_agent_second_step = QLearningAgent.load("agent_human_first.pkl")
-
-        sum = {'X':0, 'O':0, '-':0 }
-
-        for i in range(2000):
-
-            random_against_agent(trained_agent_second_step)
-
-            trained_agent_second_step.save("agent_human_first_updated.pkl")
-            print(f"{i} раз!")
-            print(sum)
-
-        print(sum)
