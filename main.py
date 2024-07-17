@@ -1,5 +1,5 @@
 from tictactoe import TicTacToe
-from q_learning_agent import train_agent_first_move, board_to_tuple, train_agent_second_move, QLearningAgent, train_agent_against_agent
+from q_learning_agent import train_agent_first_move, board_to_tuple, train_agent_second_move, QLearningAgent, train_agent_against_agent, train_agent_against_agent_updated, train_agent_against_agent_info
 from game import agent_against_agent, play_against_agent, play_against_agent_second_move, agent_against_random, random_against_agent
 import os
 
@@ -142,15 +142,17 @@ number = int(input("0 - начать обучение для агентов с �
                    "3 - дообучить агентов между собой после 0го или 1го шагов\n"
                    "4 - дообучить агентов между собой после 2го шага\n"
                    "5 - сыграть с агентом\n"
+                   "6 - посмотреть результат игры двух агентов\n"
+                   
                    "Ваше число:  "))
 
 if number == 0:
 
     # Обучение агента
-    agent_first = train_agent_first_move(50000)
+    agent_first = train_agent_first_move(800000)
     agent_first.save("agent_first.pkl")
 
-    agent_second = train_agent_second_move(50000)
+    agent_second = train_agent_second_move(800000)
     agent_second.save("agent_second.pkl")
 
     # Игра против случайного противника
@@ -166,11 +168,11 @@ if number == 0:
 elif number == 1:
 
     agent_first, agent_second = train_agent_against_agent(500000)
-    agent_first.save("agent_first.pkl")
+    # agent_first.save("agent_first.pkl")
     agent_second.save("agent_second.pkl")
 
     # Игра против агента, где агент делает первый ход
-    play_against_agent_first(agent_first)
+    # play_against_agent_first(agent_first)
 
     # Игра против агнета, где агент делает второй ход
     play_against_agent_second(agent_second)
@@ -179,55 +181,85 @@ elif number == 1:
 
 elif number == 2:
     question = int(input("1 - хотите дообучить агента, который играет за крестики\n"
-                         "2 - хотите дообучить агента, который играет за крестики\n"
+                         "2 - хотите дообучить агента, который играет за нолики\n"
                          "Ваше число:  "))
 
     if question==1:
-        if os.path.exists("agent_first_updated.pkl"):
-            trained_agent = QLearningAgent.load("agent_first_updated.pkl")
-        else:
-            trained_agent = QLearningAgent.load("agent_first.pkl")
 
-        agent_against_random(trained_agent)
+        u_o_n = int(input("1 - дообучить только обученного\n"
+                          "2 - дообучить updated\n"
+                          "Число: "))
+
+        if u_o_n == 1:
+            trained_agent = QLearningAgent.load("agent_first.pkl")
+        else:
+            trained_agent = QLearningAgent.load("agent_first_updated.pkl")
+
+        agent_first_new, summ = agent_against_random(trained_agent,10000)
+
+        print(summ)
+
+        question = int(input("1 - сохранить нового агента в updated\n"
+                             "2 - не сохранять\n"
+                             "Вводите: "))
+        if question== 1:
+            agent_first_new.save("agent_first_updated.pkl")
+        else:
+            print("Хорошо")
 
     else:
-        if os.path.exists("agent_second_updated.pkl"):
-            trained_agent = QLearningAgent.load("agent_second_updated.pkl")
-        else:
-            trained_agent = QLearningAgent.load("agent_second.pkl")
+        u_o_n = int(input("1 - дообучить только обученного\n"
+                          "2 - дообучить updated\n"
+                          "Число: "))
 
-        random_against_agent(trained_agent)
+        if u_o_n == 1:
+            trained_agent = QLearningAgent.load("agent_second.pkl")
+        else:
+            trained_agent = QLearningAgent.load("agent_second_updated.pkl")
+
+        agent_second_new, summ = random_against_agent(trained_agent, 50000)
+        print(summ)
+
+        question = int(input("1 - сохранить нового агента в updated\n"
+                             "2 - не сохранять"))
+        if question == 1:
+            agent_second_new.save("agent_second_updated.pkl")
+        else:
+            print("Хорошо")
 
 
 
 elif number == 3:
 
-    summ = {'X': 0, '0': 0, '-': 0}
-
-    for i in range(100):
-        if i == 0:
-            trained_agent_second_step = QLearningAgent.load("agent_second.pkl")
-            trained_agent_first_step = QLearningAgent.load("agent_first.pkl")
-        else:
-            trained_agent_second_step = QLearningAgent.load("agent_second_updated.pkl")
-            trained_agent_first_step = QLearningAgent.load("agent_first_updated.pkl")
-
-        result = int(agent_against_agent(trained_agent_first_step, trained_agent_second_step))
-
-        print(f"{i} раз!")
-
-        if result == 1:
-            summ['X'] += 1
-        elif result == -1:
-            summ['0'] += 1
-        elif result == 0:
-            summ['-'] += 1
 
 
-    print(f"summ = {summ}")
+    i = int(input("0 - дообучить только что обученных агентов\n"
+                  "1 - дообучить агентов с updated\n"
+                  "Вводи: "))
+    if i == 0:
+        trained_agent_second_step = QLearningAgent.load("agent_second.pkl")
+        trained_agent_first_step = QLearningAgent.load("agent_first.pkl")
+    else:
+        trained_agent_second_step = QLearningAgent.load("agent_second_updated.pkl")
+        trained_agent_first_step = QLearningAgent.load("agent_first_updated.pkl")
+
+    agent_first_new, agent_second_new, new_summ = train_agent_against_agent_updated(trained_agent_first_step, trained_agent_second_step, 5000)
+
+
+    print(new_summ)
+
+    q = int(input("1 - обновить таблицу агентов\n"
+                  "2 - без сохранения\n"
+                  "Введите цифру "))
+    if q == 1:
+        agent_first_new.save("agent_first_updated.pkl")
+        agent_second_new.save("agent_second_updated.pkl")
+    else:
+        print("Хорошо!")
 
 
 elif number == 4:
+
 
     for i in range(100):
         trained_agent_second_step = QLearningAgent.load("agent_second_updated.pkl")
@@ -242,26 +274,30 @@ elif number == 4:
 
 
 elif number == 5:
+
     new_number = int(input("1 - играть за крестики\n"
                            "2 - играть за нолики\n"
                            "Ваш выбор:  "))
-    if new_number == 1:
-        if os.path.exists("agent_second_updated.pkl"):
-            trained_agent = QLearningAgent.load("agent_second_updated.pkl")
-        else:
-            trained_agent = QLearningAgent.load("agent_second.pkl")
 
-        play_against_agent(trained_agent)
-        trained_agent.save("agent_second_updated.pkl")
+    if new_number == 1:
+        trained_agent = QLearningAgent.load("agent_second_best.pkl")
+        agent = play_against_agent(trained_agent)
+        # agent.save("agent_second_best.pkl")
 
     else:
-        if os.path.exists("agent_first_updated.pkl"):
-            trained_agent = QLearningAgent.load("agent_first_updated.pkl")
-        else:
-            trained_agent = QLearningAgent.load("agent_first.pkl")
+        trained_agent = QLearningAgent.load("agent_first_best.pkl")
+        agent = play_against_agent_second_move(trained_agent)
+        # agent.save("agent_first_best.pkl")
 
-        play_against_agent_second_move(trained_agent)
-        trained_agent.save("agent_first_updated.pkl")
+
+elif number == 6:
+    trained_agent_first = QLearningAgent.load("agent_first_best.pkl")
+    trained_agent_second = QLearningAgent.load("agent_second_best.pkl")
+
+    summ = train_agent_against_agent_info(trained_agent_first,trained_agent_second, 1000)
+    print(summ)
+
+
 
 
 

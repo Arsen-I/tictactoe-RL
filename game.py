@@ -54,6 +54,10 @@ def play_against_agent_second_move(agent):
     else:
         print("Ничья!")
 
+    return agent
+
+
+
 def play_against_agent(agent):
     env = TicTacToe()
     state = env.reset()
@@ -104,6 +108,9 @@ def play_against_agent(agent):
         print("Агент выиграл!")
     else:
         print("Ничья!")
+
+    return agent
+
 
 def agent_against_agent(agent_first_step, agent_second_step):
 
@@ -168,7 +175,6 @@ def agent_against_agent(agent_first_step, agent_second_step):
     if env.winner == 1:
         print("Выиграл Х")
         return 1
-
         # sum['X'] += 1
     elif env.winner == -1:
         print("Выиграл 0")
@@ -184,102 +190,110 @@ def agent_against_agent(agent_first_step, agent_second_step):
 
 
 
-def agent_against_random(agent_first_step):
+def agent_against_random(agent_first_step, episodes):
 
     env = TicTacToe()
-    state = env.reset()
-    done = False
+    summ = {'X': 0, 'O': 0, '-': 0}
+
 
     print("Обучение агента играть за крестики")
 
-    while not done:
+    for episod in range(episodes):
+
+        state = env.reset()
+        done = False
+
+        while not done:
+            env.render()
+            print()
+            # Ход агента за крестики
+            state_tuple = board_to_tuple(state)
+            action = agent_first_step.choose_action(state_tuple)
+            next_state, reward, done = env.step(action, 1)
+            next_state_tuple = board_to_tuple(next_state)
+            agent_first_step.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
+
+            previous_state = state_tuple
+            state = next_state_tuple
+
+            if done:
+                break
+
+            available_actions = env.available_actions()
+            opponent_action = random.choice(available_actions)
+
+            next_state, opponent_reward, done = env.step(opponent_action, -1)
+            next_state = board_to_tuple(next_state)
+
+            if done:
+                if env.check_winner(-1):
+                    print("тут победил рандом нолик")
+                    reward = -1
+                    agent_first_step.update_q_value(previous_state, action, reward, state)
+                break
+
+            state = next_state
+
         env.render()
-        print()
 
-        # Ход агента за крестики
-        state_tuple = board_to_tuple(state)
-        action = agent_first_step.choose_action(state_tuple)
-        next_state, reward, done = env.step(action, 1)
-        next_state_tuple = board_to_tuple(next_state)
-        agent_first_step.update_q_value(state_tuple, action, reward, next_state_tuple)  # Обновление Q-таблицы
+        if env.winner == 1:
+            summ['X'] += 1
+        elif env.winner == -1:
+            summ['O'] += 1
+        else:
+            summ['-'] += 1
 
-        previous_state = state_tuple
-        state = next_state_tuple
-
-        if done:
-            break
-
-        available_actions = env.available_actions()
-        opponent_action = random.choice(available_actions)
-
-        next_state, opponent_reward, done = env.step(opponent_action, -1)
-        next_state = board_to_tuple(next_state)
-
-        if done:
-            if env.check_winner(-1):
-                print("тут победил рандом нолик")
-                reward = -1
-                agent_first_step.update_q_value(previous_state, action, reward, state)
-            break
-
-        state = next_state
-
-    env.render()
-
-    if env.winner == 1:
-        print("Выиграл Х")
-        return 1
-    elif env.winner == -1:
-        print("Выиграл 0")
-        return 0
-    else:
-        print("Ничья!")
-        return 0
+    return agent_first_step, summ
 
 
-def random_against_agent(agent_second_step):
+
+def random_against_agent(agent_second_step, episodes):
     env = TicTacToe()
-    state = env.reset()
-    previous_state = state
-    done = False
+    summ = {'X': 0, 'O': 0, '-': 0}
 
-    print("Обучение агента играть за нолики")
 
-    while not done:
-        available_actions = env.available_actions()
-        opponent_action = random.choice(available_actions)
+    for episode in range(episodes):
 
-        next_state, opponent_reward, done = env.step(opponent_action, 1)
-        next_state = board_to_tuple(next_state)
+        state = env.reset()
+        previous_state = state
+        done = False
 
-        if done:
-            if env.check_winner(1):
-                print("тут победил рандом крестик")
-                reward = -1
-                agent_second_step.update_q_value(previous_state, action, reward, state)
-            break
+        while not done:
+            available_actions = env.available_actions()
+            opponent_action = random.choice(available_actions)
 
-        action = agent_second_step.choose_action(next_state)
-        state, reward, done = env.step(action, -1)
-        state = board_to_tuple(state)
+            next_state, opponent_reward, done = env.step(opponent_action, 1)
+            next_state = board_to_tuple(next_state)
 
-        agent_second_step.update_q_value(next_state, action, reward, state)
+            if done:
+                if env.check_winner(1):
+                    # print("тут победил рандом крестик")
+                    reward = -1
+                    agent_second_step.update_q_value(previous_state, action, reward, state)
+                break
 
-        if done:
-            break
+            action = agent_second_step.choose_action(next_state)
+            state, reward, done = env.step(action, -1)
+            state = board_to_tuple(state)
 
-        previous_state = next_state
+            agent_second_step.update_q_value(next_state, action, reward, state)
 
-    env.render()
+            if done:
+                break
 
-    if env.winner == 1:
-        print("Выиграл Х")
-        return 0
-    elif env.winner == -1:
-        print("Выиграл 0")
-        return 1
-    else:
-        print("Ничья!")
-        return 0
+            previous_state = next_state
+
+        # env.render()
+
+        if env.winner == 1:
+            summ['X'] += 1
+        elif env.winner == -1:
+            summ['O'] += 1
+        else:
+            summ['-'] += 1
+
+    return agent_second_step, summ
+
+
 
 
